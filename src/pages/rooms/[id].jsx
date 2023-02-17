@@ -94,7 +94,6 @@ export default function Room() {
             return `${years} years ago`;
         }
     }
-
     return <>
         <div className="grid grid-cols-12">
             <div className="col-span-9 md:w-full w-screen">

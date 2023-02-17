@@ -2,6 +2,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useConnection } from "context/connect";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
+import { faLock } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export default function Sidebar() {
     const router = useRouter();
@@ -178,10 +180,7 @@ export default function Sidebar() {
                             <span className="text-xs text-gray-400">Created by {room?.owner?.username.split(0, 5) + '...'}</span>
                         </div>
                         <div className="flex flex-row justify-end w-full items-center space-x-1">
-                            {room.passwordProtected && <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 12a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0 2a10 10 0 100-20 10 10 0 000 20z" clipRule="evenodd" />
-                            </svg>}
+                            {room.passwordProtected && <FontAwesomeIcon className=" h-3 mx-2" icon={faLock} />}
                             <span className="text-xs text-gray-400 bg-[#18191b] rounded-md p-1">{room.users || 0}/{room.maxUsers}</span>
                         </div>
                     </div>
@@ -211,10 +210,7 @@ export default function Sidebar() {
                         </div>
                         <span className="text-xs text-gray-400 bg-[#18191b] rounded-md p-1 absolute right-4 ">{room.users || 0}/{room.maxUsers}</span>
                         <div className="flex flex-col justify-end w-full items-center space-x-1">
-                            {room.passwordProtected && <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 12a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0 2a10 10 0 100-20 10 10 0 000 20z" clipRule="evenodd" />
-                            </svg>}
+                            {room.passwordProtected && <FontAwesomeIcon className=" h-4 mx-2" icon={faLock} />}
                         </div>
                     </div>
                 })}

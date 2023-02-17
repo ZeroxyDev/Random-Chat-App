@@ -74,7 +74,7 @@ export default (async (req, res) => {
     });
 
     socket.on("createRoom", data => {
-      const { name, password } = data;
+      const { name, password, maxUsers } = data;
       if (!name) return socket.emit("createRoom", { success: false, error: "Name is required" });
       if (io.sockets.adapter.rooms[name]) return socket.emit("createRoom", { success: false, error: "Room already exists" });
       let room = {
@@ -82,7 +82,7 @@ export default (async (req, res) => {
         name: name.replace(/[^a-zA-Z0-9 ]/g, ""),
         owner: socket.data.user,
         users: 1,
-        maxUsers: 10
+        maxUsers: maxUsers,
       };
 
       if (password) room.password = password;

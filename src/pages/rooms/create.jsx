@@ -9,11 +9,21 @@ export default function Home() {
 
     const CreateRoom = event => {
         event.preventDefault();
+        var maxus = 0
+        if(event.target.maxUsers.value > 1 && event.target.maxUsers.value < 11){
+            maxus = event.target.maxUsers.value
+        }else{
+            maxus = 10
+        }
+
         const name = event.target.name.value;
         const password = event.target.password.value;
-        connection.emit('createRoom', { name, password });
+        const maxUsers = maxus || 10;
+
+        connection.emit('createRoom', { name, password, maxUsers });
         connection.on('createRoom', data => {
             const result = data;
+            console.log(data)
 
             if (result.success) {
                 router.push('/rooms/' + result.data.id);
@@ -60,6 +70,10 @@ export default function Home() {
                         <div className="relative mb-2">
                             <label htmlFor="name" className="text-sm md:text-[12.5px] leading-tighter text-gray-300 uppercase font-medium cursor-text">Password <span className="text-xs italic lowercase font-thin opacity-50">optional</span></label>
                             <input id="password" autoComplete='off' className="text-white bg-dark-3 transition-all duration-200 w-full rounded-lg p-3 border border-gray-300/10 focus:border-gray-700 outline-none ring-none" type="text" />
+                        </div>
+                        <div className="relative mb-2">
+                            <label htmlFor="name" className="text-sm md:text-[12.5px] leading-tighter text-gray-300 uppercase font-medium cursor-text">Maximum users <span className="text-xs italic lowercase font-thin opacity-50">optional</span></label>
+                            <input id="maxUsers" autoComplete='off' placeholder='10' type="number" min="2" max="10" className="text-white bg-dark-3 transition-all duration-200 w-full rounded-lg p-3 border border-gray-300/10 focus:border-gray-700 outline-none ring-none" />
                         </div>
                         <div className="space-y-9">
                             <div className="text-sm flex justify-end items-center h-full mt-16">
