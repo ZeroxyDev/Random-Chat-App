@@ -7,18 +7,22 @@ export default function Home() {
     const router = useRouter();
     let [error, setError] = useState(null);
 
+
+/*     max users permitted variable */
+    const maxusers = 30;
+
     const CreateRoom = event => {
         event.preventDefault();
         var maxus = 0
-        if(event.target.maxUsers.value > 1 && event.target.maxUsers.value < 11){
+        if(event.target.maxUsers.value > 1 && event.target.maxUsers.value <= maxusers){
             maxus = event.target.maxUsers.value
         }else{
-            maxus = 10
+            maxus = maxusers
         }
 
         const name = event.target.name.value;
         const password = event.target.password.value;
-        const maxUsers = maxus || 10;
+        const maxUsers = maxus || maxusers;
 
         connection.emit('createRoom', { name, password, maxUsers });
         connection.on('createRoom', data => {
@@ -73,7 +77,7 @@ export default function Home() {
                         </div>
                         <div className="relative mb-2">
                             <label htmlFor="name" className="text-sm md:text-[12.5px] leading-tighter text-gray-300 uppercase font-medium cursor-text">Maximum users <span className="text-xs italic lowercase font-thin opacity-50">optional</span></label>
-                            <input id="maxUsers" autoComplete='off' placeholder='10' type="number" min="2" max="10" className="text-white bg-dark-3 transition-all duration-200 w-full rounded-lg p-3 border border-gray-300/10 focus:border-gray-700 outline-none ring-none" />
+                            <input id="maxUsers" autoComplete='off' placeholder={maxusers} type="number" min="2" max="30" className="text-white bg-dark-3 transition-all duration-200 w-full rounded-lg p-3 border border-gray-300/10 focus:border-gray-700 outline-none ring-none" />
                         </div>
                         <div className="space-y-9">
                             <div className="text-sm flex justify-end items-center h-full mt-16">

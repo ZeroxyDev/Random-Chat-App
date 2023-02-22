@@ -131,11 +131,12 @@ export default function Room() {
                                 if (message.self) {
                                     return <div key={index} className="flex justify-end items-center gap-2">
                                         <div className="flex flex-col items-end">
-                                            <p className="text-xs text-gray-500">{message.user.username}</p>
+                                            <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg">{message.user.username}</p>
                                             <div className="bg-zinc-500/10 rounded-xl p-3">
                                                 <p className="text-sm text-white">{message.message}</p>
+                                                <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
                                             </div>
-                                            <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
+                                   
                                         </div>
                                         <img src={`https://avatars.dicebear.com/api/micah/${message.user?.username || "No Name"}.png`} alt="username" className="w-10 h-10 rounded-full" />
                                     </div>
@@ -143,11 +144,11 @@ export default function Room() {
                                     return <div key={index} className="flex justify-start items-center gap-2">
                                         <img src={`https://avatars.dicebear.com/api/micah/${message.user?.username || "No Name"}.png`} alt="username" className="w-10 h-10 rounded-full" />
                                         <div className="flex flex-col items-start">
-                                            <p className="text-xs text-gray-500">{message.user.username}</p>
+                                            <p className="text-xs text-gray-500 p-1 ml-1 rounded-lg">{message.user.username}</p>
                                             <div className="bg-zinc-500/10 rounded-xl p-3">
                                                 <p className="text-sm text-white">{message.message}</p>
+                                                <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
                                             </div>
-                                            <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
                                         </div>
                                     </div>
                                 }
