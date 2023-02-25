@@ -1,8 +1,10 @@
 import { useConnection } from "context/connect";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { faLock } from '@fortawesome/free-solid-svg-icons'
+import { useEffect, useState, useRef } from "react";
+import { faCheckCircle, faCrown, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { motion, AnimatePresence } from "framer-motion"
+import cn from 'clsx';
 
 export default function Room() {
     const router = useRouter();
@@ -10,6 +12,12 @@ export default function Room() {
     let [members, setMembers] = useState([]);
     let [messages, setMessages] = useState([]);
     const { connection } = useConnection();
+    let [typping, setTypping] = useState([]);
+    let [istypping, setIstypping] = useState(false);
+    let [user, setUser] = useState(null);
+    let [rooms, setRooms] = useState([]);
+    let [membertyp, setMembertyp] = useState([]);
+    const { id } = router.query
 
     useEffect(() => {
         if (connection) {
@@ -24,6 +32,30 @@ export default function Room() {
             }
         }
     }, [connection]);
+
+    const ref = useRef();
+    useEffect(() => {
+      if (ref.current) {
+        ref.current.scrollTop = ref.current.scrollHeight;
+      }
+    }, [messages]);
+
+    useEffect(() => {
+        if (connection) {
+            connection.emit('fetchRooms');
+            connection.on('rooms', data => {
+                setRooms(data.rooms);
+            });
+            return () => {
+                connection.off('rooms', data => {
+                    if (data.isLogged) {
+                        setUser(data.user);
+                    }
+                    setRooms(data.rooms);
+                });
+            }
+        }
+    }, [router]);
 
     useEffect(() => {
         if (connection) {
@@ -57,6 +89,50 @@ export default function Room() {
             }
         });
     }
+
+    useEffect(() => {
+
+        connection.off('IsTypping').on('IsTypping', data => {
+            setIstypping(true)
+            setTypping(data)
+            setMembertyp(data)
+            if(!istypping){
+                setTimeout(function (){
+                console.log("typping")
+                setIstypping(false)
+            }, 2000)
+            }
+            
+        });
+
+    }, [istypping]);
+
+    function typpingu(){
+        connection.emit('IsTypping');
+    }
+
+    useEffect(() => {
+        if (connection) {
+            connection.emit('fetchUser');
+            connection.on('user', data => {
+                if (data === null) {
+                    router.push('/');
+                } else {
+                    setUser(data);
+                }
+            });
+
+            return () => {
+                connection.off('user', data => {
+                    if (data === null) {
+                        router.push('/');
+                    } else {
+                        setUser(data);
+                    }
+                });
+            }
+        }
+    }, [connection]);
 
     const dateNow = date => {
         const now = new Date();
@@ -95,6 +171,7 @@ export default function Room() {
         }
     }
     return <>
+        <AnimatePresence>
         <div className="grid grid-cols-12">
             <div className="col-span-9 md:w-full w-screen">
                 <div className="border-b border-zinc-500/5 flex items-center justify-between px-6 py-5 text-white">
@@ -113,8 +190,9 @@ export default function Room() {
                         </button>
                     </div>
                 </div>
-                <div className="px-6 py-5 md:max-h-[74%] max-h-[70vh] overflow-auto">
+                <div className="px-6 py-5 md:max-h-[81vh] max-h-[70vh] overflow-auto" ref={ref}>
                     <div className="flex flex-col space-y-4">
+                    <motion.li className="flex flex-col space-y-4" layout initial='initial' animate='animate' exit='exit'> 
                         {messages.filter(Boolean).filter(el => {
                             if (!el.system) {
                                 if (el.user) return true;
@@ -131,7 +209,8 @@ export default function Room() {
                                 if (message.self) {
                                     return <div key={index} className="flex justify-end items-center gap-2">
                                         <div className="flex flex-col items-end">
-                                            <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg">{message.user.username}</p>
+                                            
+                                            {!message.user.verified  ? <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg">{message.user.username}</p> : <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg flex items-center">{message.user.username}<FontAwesomeIcon className=" h-3 mx-1" icon={faCheckCircle} /></p>}
                                             <div className="bg-zinc-500/10 rounded-xl p-3">
                                                 <p className="text-sm text-white">{message.message}</p>
                                                 <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
@@ -139,12 +218,12 @@ export default function Room() {
                                    
                                         </div>
                                         <img src={`https://avatars.dicebear.com/api/micah/${message.user?.username || "No Name"}.png`} alt="username" className="w-10 h-10 rounded-full" />
-                                    </div>
+                                    </div> 
                                 } else {
                                     return <div key={index} className="flex justify-start items-center gap-2">
                                         <img src={`https://avatars.dicebear.com/api/micah/${message.user?.username || "No Name"}.png`} alt="username" className="w-10 h-10 rounded-full" />
                                         <div className="flex flex-col items-start">
-                                            <p className="text-xs text-gray-500 p-1 ml-1 rounded-lg">{message.user.username}</p>
+                                        {!message.user.verified ? <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg">{message.user.username}</p> : <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg flex items-center">{message.user.username}<FontAwesomeIcon className=" h-3 mx-1" icon={faCheckCircle} /></p>}
                                             <div className="bg-zinc-500/10 rounded-xl p-3">
                                                 <p className="text-sm text-white">{message.message}</p>
                                                 <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
@@ -154,6 +233,14 @@ export default function Room() {
                                 }
                             }
                         })}
+                     </motion.li>
+
+                     <div> {membertyp?.username != user?.username &&
+                            <div className="flex flex-row items-center">
+                           {istypping && typping?.user.username != user?.username && <img src={`https://avatars.dicebear.com/api/micah/${typping?.user.username || "No Name"}.png`} alt="username" className="w-10 h-10 rounded-full" />}
+                            {istypping && typping?.user.username != user?.username && <p className="text-xs text-gray-500 mt-2">{typping?.user.username} is typing...</p>}
+                        </div>}
+                               </div>
                     </div>
                 </div>
 
@@ -167,7 +254,7 @@ export default function Room() {
                         }
                     }}>
                         <div className="flex items-center">
-                            <input name="message" type="text" className="bg-zinc-500/10 rounded-md w-full px-4 py-2 text-white outline-none" autoComplete="off" placeholder="Type a message..." />
+                            <input onChange={() => typpingu()} name="message" type="text" className="bg-zinc-500/10 rounded-md w-full px-4 py-2 text-white outline-none" autoComplete="off" placeholder="Type a message..." />
                             <button type="submit" className="bg-zinc-500/10 hover:bg-zinc-500/20 rounded-md p-2 ml-2 transition-all duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -184,10 +271,10 @@ export default function Room() {
                             <div className="flex items-center w-full">
                                 <img src={`https://avatars.dicebear.com/api/micah/${member?.username || "No Name"}.png`} alt="username" className="w-10 h-10 rounded-full" />
                                 <div className="ml-3 flex items-center justify-between gap-2 w-full">
-                                    <p className="text-sm font-medium">{member?.username}</p>
+                                    <p className="text-sm font-medium flex flex-row items-center">{member?.username} {member?.verified  && <FontAwesomeIcon className=" h-3 mx-1" icon={faCheckCircle} />}</p>
                                     {room?.owner?.username === member?.username && <>
                                         <div className="flex items-center justify-center gap-1">
-                                            <p className="text-sm uppercase font-semibold opacity-50">Owner</p>
+                                            <p className="text-sm uppercase font-semibold opacity-50"><FontAwesomeIcon className=" h-4 mx-1" icon={faCrown} /></p>
                                         </div>
                                     </>}
 
@@ -198,5 +285,6 @@ export default function Room() {
                 </div>
             </div>
         </div>
+        </AnimatePresence>
     </>
 }

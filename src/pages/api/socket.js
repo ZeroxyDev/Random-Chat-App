@@ -27,12 +27,27 @@ export default (async (req, res) => {
 
       const allSockets = await io.fetchSockets();
       const userSockets = allSockets.filter((s) => s?.data?.user?.username === username);
+  
 
-      if (userSockets.length > 0) return socket.emit("login", { error: "Username already taken" });
+      if (userSockets.length > 0) return socket.emit("login", { error: "Username already taken"});
 
-      const user = {
-        username
+
+      var user = {
+        username,
       };
+
+      if(username == "Aaron"){
+         user = {
+          username,
+          verified: true,
+        };
+      }else{
+        user = {
+          username
+        };
+      }
+
+
 
       socket.data.user = user;
       socket.emit("login", {
@@ -70,7 +85,17 @@ export default (async (req, res) => {
           user: socket.data?.user,
           rooms: allRooms
         });
+
+        const allSockets = await io.fetchSockets();
+        const users = allSockets.filter((s) => s?.data?.user?.username);
+        const usersonline = users.length;
+        
+        socket.emit("UsersOnline", { success: true, users: usersonline });
       }, 1000);
+    });
+
+    socket.on("UsersOnline", async () => {
+      socket.emit("UsersOnline", { success: true });
     });
 
     socket.on("createRoom", data => {
@@ -132,6 +157,36 @@ export default (async (req, res) => {
       });
     });
 
+    socket.on("joinRoomStranger", async data => {
+      const { id, password } = data;
+      if (!id) return socket.emit("joinRoomStranger", { success: false, error: "Room id is required" });
+      if (!io.sockets.adapter.rooms[id]) return socket.emit("joinRoomStranger", { success: false, error: "Room not found" });
+
+      const room = io.sockets.adapter.rooms[id];
+      if (room.password && room.password !== password) return socket.emit("joinRoomStranger", { success: false, error: "Wrong password" });
+      const sockets = await io.in(id).fetchSockets();
+      if (sockets.length >= room.maxUsers) return socket.emit("joinRoomStranger", { success: false, error: "Room is full" });
+      if (sockets.find((s) => s.data.user.username === socket.data.user.username)) return socket.emit("joinRoomStranger", { success: false, alreadyIn: true, error: "You are already in this room" });
+
+      socket.rooms.forEach((user_room) => {
+        socket.leave(user_room);
+        updateMembers(user_room);
+        socket.to(user_room).emit("message", {
+          system: true,
+          message: `${socket.data.user.username} left the room`
+        });
+      });
+
+      socket.join(id);
+
+      updateMembers(id);
+      socket.emit("joinRoomStranger", { success: true, data: room });
+      socket.to(id).emit("message", {
+        system: true,
+        message: `A stranger joins the room`
+      });
+    });
+
     socket.on("leaveRoom", async () => {
       const room = Array.from(socket.rooms).find(room => room !== socket.id);
       if (!room) return socket.emit("leaveRoom", { success: false, error: "You are not in a room" });
@@ -144,6 +199,39 @@ export default (async (req, res) => {
         system: true,
         message: `${socket.data.user.username} left the room`
       });
+    });
+
+    socket.on("leaveRoomStranger", async () => {
+      const room = Array.from(socket.rooms).find(room => room !== socket.id);
+      if (!room) return socket.emit("leaveRoomStranger", { success: false, error: "You are not in a room" });
+      socket.leaveAll();
+      socket.join("global");
+      socket.emit("leaveRoomStranger", { success: true });
+
+      socket.to(room).emit("ClearMessages", {
+        success: true,
+      });
+
+
+      updateMembers(room);
+      socket.to(room).emit("message", {
+        system: true,
+        message: `Stranger left the room`
+      });
+      
+    });
+
+    socket.on("ClearMessages", async () => {
+      socket.emit("ClearMessages", { success: true });
+    });
+
+    socket.on("IsTypping", async () => {
+      const room = Array.from(socket.rooms).find(room => room !== socket.id);
+      socket.to(room).emit("IsTypping", {
+        success: true,
+        user: socket.data.user,
+      });
+      
     });
 
     socket.on("roomMembers", async () => {

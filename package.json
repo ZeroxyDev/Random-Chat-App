@@ -12,6 +12,8 @@
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@headlessui/react": "^1.6.6",
+    "clsx": "^1.2.1",
+    "framer-motion": "^9.0.7",
     "next": "12.2.5",
     "next-iron-session": "^4.2.0",
     "react": "18.2.0",

@@ -1,6 +1,7 @@
 import { useConnection } from 'context/connect'
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function Home() {
   const { connection } = useConnection();
@@ -32,9 +33,14 @@ export default function Home() {
   }, []);
 
   return <>
-    <div>
+      <motion.div
+    initial={{x: -500}}
+  animate={{ x:0 }}
+  transition={{ duration: 0.5, type: "tween" }}
+>
+    <div className='bg-dark-2'>
       <div className="h-screen m-30 md:h-screen relative flex flex-col justify-center items-center ">
-        <div className="bg-dark-2 md:shadow-lg shadow-none p-10 pb-0 rounded-xl">
+        <div className="bg-dark-2 shadow-none p-10 pb-0 rounded-xl">
           <div className="flex flex-col items-center space-y-3">
             <span className="text-xl md:text-2xl font-semi-bold leading-normal text-white">Whats your name?</span>
           </div>
@@ -55,5 +61,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </motion.div>
   </>
 }
