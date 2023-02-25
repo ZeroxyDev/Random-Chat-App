@@ -246,7 +246,7 @@ Project Link: [https://github.com/ZeroxyDev/Random-Chat-App](https://github.com/
 [issues-shield]: https://img.shields.io/github/issues/ZeroxyDev/Random-Chat-App.svg?style=for-the-badge
 [issues-url]: https://github.com/ZeroxyDev/Random-Chat-App/issues
 [license-shield]: https://img.shields.io/github/license/ZeroxyDev/Random-Chat-App.svg?style=for-the-badge
-[license-url]: https://github.com/ZeroxyDev/Random-Chat-App/blob/master/LICENSE.txt
+[license-url]: https://github.com/ZeroxyDev/Random-Chat-App/blob/main/LICENSE.md
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/zeroxydev
 [product-screenshot]: images/screenshot.png
