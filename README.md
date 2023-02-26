@@ -172,6 +172,7 @@ This application does not require special use, you can implement functions, rede
 - [x] Add unic tags
 - [x] Add verified badge on specific names
 - [x] Add responsive design
+- [x] Add send images
 - [ ] Multi-language Support
     - [ ] Spanish
 
