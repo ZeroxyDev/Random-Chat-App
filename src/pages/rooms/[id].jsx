@@ -1,7 +1,7 @@
 import { useConnection } from "context/connect";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
-import { faCheckCircle, faCrown, faLock } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faCrown, faLink, faLock, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from "framer-motion"
 import cn from 'clsx';
@@ -134,6 +134,33 @@ export default function Room() {
         }
     }, [connection]);
 
+    /*     images */
+    
+    let [file, setFile] = useState(null);
+    let [filetype, setFiletype] = useState([]);
+    let [preview, setPreview] = useState([]);
+    let [imgsrc, setImgsrc] = useState([]);
+
+    const handleFiles = async (file) => {
+        const selectedFile = file.target.files[0];
+        setFile(selectedFile)
+        const url = window.URL.createObjectURL(selectedFile) || ""
+        console.log(selectedFile.type)
+        setFiletype(selectedFile.type)
+        setPreview(url)
+      }
+      function resetFile(){
+        if (file){
+            setFile(null)
+            setFiletype(null)
+        }
+      }
+    function Image(props, type){
+        var blob = new Blob( [ props ], { type: type } );
+        var urlCreator = window.URL || window.webkitURL;
+        var imageUrl = urlCreator.createObjectURL( blob );
+        return(imageUrl)}
+
     const dateNow = date => {
         const now = new Date();
         const msgDate = new Date(date);
@@ -212,6 +239,7 @@ export default function Room() {
                                             
                                             {!message.user.verified  ? <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg">{message.user.username}</p> : <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg flex items-center">{message.user.username}<FontAwesomeIcon className=" h-3 mx-1" icon={faCheckCircle} /></p>}
                                             <div className="bg-zinc-500/10 rounded-xl p-3">
+                                            {message.file && <img className="h-[300px] rounded-lg justify-end mb-2 object-cover" src={Image(message.file, message.type)}/>}
                                                 <p className="text-sm text-white">{message.message}</p>
                                                 <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
                                             </div>
@@ -225,6 +253,7 @@ export default function Room() {
                                         <div className="flex flex-col items-start">
                                         {!message.user.verified ? <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg">{message.user.username}</p> : <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg flex items-center">{message.user.username}<FontAwesomeIcon className=" h-3 mx-1" icon={faCheckCircle} /></p>}
                                             <div className="bg-zinc-500/10 rounded-xl p-3">
+                                            {message.file && <img className="h-[300px] rounded-lg justify-end mb-2 object-cover" src={Image(message.file, message.type)}/>}
                                                 <p className="text-sm text-white">{message.message}</p>
                                                 <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
                                             </div>
@@ -248,13 +277,33 @@ export default function Room() {
                     <form onSubmit={e => {
                         e.preventDefault();
                         const message = e.target.message.value;
-                        if (message) {
+                        if (message && !file) {
                             connection.emit('message', { message });
                             e.target.message.value = '';
+                        }else{
+                            connection.emit('message', { message, file: file, type: filetype });
+                            e.target.message.value = '';
+                            setFile(null)
                         }
                     }}>
+
+                      <motion.li className="flex flex-col space-y-4" layout initial='initial' animate='animate' exit='animate'> 
+                        <div className="w-full flex flex-row justify-end">
+                        {file && <div className="bg-zinc-500/10 rounded-lg w-fit my-4 h-fit p-2 text-white outline-none " >
+                        <button className="" onClick={() => resetFile()}><FontAwesomeIcon className=" h-4 w-full text-zinc-500/50 text-white mx-1" icon={faXmark} /></button>
+                            <img className="h-60 rounded-lg justify-end object-cover" src={preview}/>
+                        </div>}
+                        </div>
+                      </motion.li> 
+
                         <div className="flex items-center">
                             <input onChange={() => typpingu()} name="message" type="text" className="bg-zinc-500/10 rounded-md w-full px-4 py-2 text-white outline-none" autoComplete="off" placeholder="Type a message..." />
+                            <button type="button" className="relative bg-zinc-500/10 hover:bg-zinc-500/20 rounded-md p-2 ml-2 transition-all duration-200">
+                                <div className="flex flex-col justify-center items-center">
+                                <FontAwesomeIcon className=" h-6 w-6 text-white rotate-90 mx-1" icon={faLink} />
+                            <input  id="file" type="file" onChange={handleFiles} className="h-full w-full text-white mx-1 absolute opacity-0"></input>
+                                </div>
+                            </button>
                             <button type="submit" className="bg-zinc-500/10 hover:bg-zinc-500/20 rounded-md p-2 ml-2 transition-all duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

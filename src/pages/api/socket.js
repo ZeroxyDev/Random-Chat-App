@@ -256,11 +256,23 @@ export default (async (req, res) => {
       const room = Array.from(socket.rooms).find(room => room !== socket.id);
       if (!room) return;
 
-      const message = {
+      var message = {
         user: socket.data.user,
         message: data.message,
-        date: new Date()
-      };
+        date: new Date(),
+      }
+
+      if (data.file && data.type == "image/jpeg" || data.type == "image/png" ){
+        message = {
+          user: socket.data.user,
+          message: data.message,
+          date: new Date(),
+          file: data.file,
+          type: data.type,
+        };
+      }
+
+
 
       const sockets = await io.in(room).fetchSockets();
       sockets.forEach(s => {
