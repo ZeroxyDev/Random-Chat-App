@@ -211,7 +211,7 @@ export default function Room() {
                         <img src={`${mainConfig.initialsAPI + room?.name || mainConfig.initialsAPI + "NoName"}.png`} alt="username" className="w-14 h-14 rounded-full" />
                         <div className="ml-3">
                             <p className="text-lg font-medium flex items-center">{room?.name} {room?.password && <FontAwesomeIcon className=" h-3 mx-2" icon={faLock} />}</p>
-                            <p className="text-xs font-medium italic text-gray-500">{members?.length} members</p>
+                            <p className="text-xs font-medium italic text-gray-500">{members?.length} {members?.length != 1 ? "members" : "member"} in chat</p>
                         </div>
                     </div>
                     <div className="flex items-center">
@@ -220,7 +220,7 @@ export default function Room() {
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
                         </button>
-                        <button onClick={() => setShowMembers(!showMembers)} className="bg-zinc-500/10 hover:bg-zinc-500/20 rounded-full p-2 mr-2">
+                        <button onClick={() => setShowMembers(!showMembers)} className="bg-zinc-500/10  hidden 2xl:flex hover:bg-zinc-500/20 rounded-full p-2 mr-2">
                         <FontAwesomeIcon className=" h-4 mx-1" icon={faUser} />
                         </button>
 
@@ -252,7 +252,7 @@ export default function Room() {
                                             {!message.user.verified  ? <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg">{message.user.username}</p> : <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg flex items-center">{message.user.username}<FontAwesomeIcon className=" h-3 mx-1" icon={faCheckCircle} /></p>}
                                             <div className="bg-zinc-500/10 rounded-xl p-3">
                                             {message.file && <img className="h-[300px] rounded-lg justify-end mb-2 object-cover" src={Image(message.file, message.type)}/>}
-                                                <p className="text-sm text-white">{message.message}</p>
+                                                <p className="text-sm text-white break-all">{message.message}</p>
                                                 <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
                                             </div>
                                    
@@ -268,7 +268,7 @@ export default function Room() {
                                         {!message.user.verified ? <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg">{message.user.username}</p> : <p className="text-xs text-gray-500  p-1 mr-1 rounded-lg flex items-center">{message.user.username}<FontAwesomeIcon className=" h-3 mx-1" icon={faCheckCircle} /></p>}
                                             <div className="bg-zinc-500/10 rounded-xl p-3">
                                             {message.file && <img className="h-[300px] rounded-lg justify-end mb-2 object-cover" src={Image(message.file, message.type)}/>}
-                                                <p className="text-sm text-white">{message.message}</p>
+                                                <p className="text-sm text-white break-all">{message.message}</p>
                                                 <p className="text-xs text-gray-500">{dateNow(message.date)}</p>
                                             </div>
                                         </div>
@@ -292,7 +292,7 @@ export default function Room() {
                 <form onSubmit={e => {
                         e.preventDefault();
                         const message = e.target.message.value;
-                        if(!message?.length > 0)return
+                        if(!message?.length > 0 && !file)return
                         if (message && !file) {
                             connection.emit('message', { message });
                             e.target.message.value = '';

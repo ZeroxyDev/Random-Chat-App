@@ -4,6 +4,7 @@
 export const mainConfig = {
     //General
     nameApp: "Sesh",
+    imageApp: "https://i.ibb.co/n30R7NH/logo.png",
     //API
     avatarAPI: "https://api.dicebear.com/7.x/lorelei/svg?seed=", //API of avatars
     initialsAPI: "https://api.dicebear.com/7.x/initials/svg?seed=", // API of initials
