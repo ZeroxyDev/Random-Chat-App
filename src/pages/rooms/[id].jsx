@@ -292,6 +292,7 @@ export default function Room() {
                 <form onSubmit={e => {
                         e.preventDefault();
                         const message = e.target.message.value;
+                        if(!message?.length > 0)return
                         if (message && !file) {
                             connection.emit('message', { message });
                             e.target.message.value = '';
