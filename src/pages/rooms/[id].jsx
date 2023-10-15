@@ -1,7 +1,7 @@
 import { useConnection } from "context/connect";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
-import { faCheckCircle, faCrown, faLink, faLock, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faCrown, faLink, faLock, faXmark, faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from "framer-motion"
 import cn from 'clsx';
@@ -15,6 +15,7 @@ export default function Room() {
     const { connection } = useConnection();
     let [typping, setTypping] = useState([]);
     let [istypping, setIstypping] = useState(false);
+    let [showMembers, setShowMembers] = useState(true);
     let [user, setUser] = useState(null);
     let [rooms, setRooms] = useState([]);
     let [membertyp, setMembertyp] = useState([]);
@@ -162,6 +163,9 @@ export default function Room() {
 
         /*     END IMAGES */
 
+
+    
+
     const dateNow = date => {
         const now = new Date();
         const msgDate = new Date(date);
@@ -200,7 +204,7 @@ export default function Room() {
     }
     return <>
       
-        <div className="2xl:grid grid-cols-12 relative">
+        <div className={showMembers ? `2xl:grid grid-cols-12 relative` : `relative`}>
             <div className="col-span-9 2xl:w-full relative">
                 <div className="border-b border-zinc-500/5 flex items-center justify-between px-6 py-5 text-white">
                     <div className="flex items-center">
@@ -216,6 +220,10 @@ export default function Room() {
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
                         </button>
+                        <button onClick={() => setShowMembers(!showMembers)} className="bg-zinc-500/10 hover:bg-zinc-500/20 rounded-full p-2 mr-2">
+                        <FontAwesomeIcon className=" h-4 mx-1" icon={faUser} />
+                        </button>
+
                     </div>
                 </div>
                 <div className="px-6 py-5 md:max-h-[81vh] max-h-[80vh] overflow-auto" ref={ref}>
@@ -280,7 +288,7 @@ export default function Room() {
                     </div>
                 </div>
 
-                <div className="border-t border-zinc-500/5 bg-[#111214] px-6 py-5 fixed bottom-0 w-full md:w-fill-available 2xl:max-w-[60.3%]">
+                <div className={`border-t border-zinc-500/5 bg-[#111214] px-6 py-5 fixed bottom-0 w-full md:w-fill-available ${showMembers && "2xl:max-w-[60.3%]"}`}>
                 <form onSubmit={e => {
                         e.preventDefault();
                         const message = e.target.message.value;
@@ -320,7 +328,8 @@ export default function Room() {
                     </form>
                 </div>
             </div>
-            <div className="col-span-3 border-l border-zinc-500/5 h-screen w-full 2xl:block hidden">
+            {showMembers && <div  className="col-span-3 border-l border-zinc-500/5 h-screen w-full 2xl:block hidden">
+                
                 <div className="overflow-y-auto h-full p-3 space-y-2">
                     {members?.map(member => (
                         <div className="flex items-center justify-between px-6 py-5 text-white bg-zinc-500/5 rounded-lg">
@@ -339,7 +348,7 @@ export default function Room() {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div>}
         </div>
     </>
 }

@@ -1,7 +1,7 @@
 import { useConnection } from "context/connect";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
-import { faCheckCircle, faCrown, faLink, faLock, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faCrown, faLink, faLock, faUser, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from "framer-motion"
 import cn from 'clsx';
@@ -22,6 +22,7 @@ export default function Room() {
     let [user, setUser] = useState(null);
     let [typping, setTypping] = useState([]);
     let [istypping, setIstypping] = useState(false);
+    let [showMembers, setShowMembers] = useState(true);
     let [online, setOnline] = useState(0);
 
     const ref = useRef();
@@ -323,7 +324,7 @@ export default function Room() {
     }
     return <>
     
-        <div className="2xl:grid grid-cols-12">
+        <div className={`${showMembers && '2xl:grid'} grid-cols-12`}>
             <div className="col-span-9 2xl:w-full">
                 <div className="border-b border-zinc-500/5 flex items-center justify-between px-6 py-5 text-white">
                     <div className="flex items-center">
@@ -333,11 +334,14 @@ export default function Room() {
                             <p className="text-xs font-medium italic text-gray-500">{members.filter(a=>a).length == 1 ? <p>Searching stranger to talk...</p> : <p>This room is with a stranger. </p>}</p>
                         </div>
                     </div>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-row items-center">
                         <button onClick={LeaveRoom} className="bg-zinc-500/10 hover:bg-zinc-500/20 rounded-full p-2 mr-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
+                        </button>
+                        <button onClick={() => setShowMembers(!showMembers)} className="bg-zinc-500/10 hover:bg-zinc-500/20 rounded-full p-2 mr-2">
+                        <FontAwesomeIcon className=" h-4 mx-1" icon={faUser} />
                         </button>
                     </div>
                 </div>
@@ -408,7 +412,7 @@ export default function Room() {
                     </div>
                 </div>
 
-                <div className="border-t border-zinc-500/5 bg-[#111214] px-6 py-5 fixed bottom-0 w-full md:w-fill-available 2xl:max-w-[75%]">
+                <div className={`border-t border-zinc-500/5 bg-[#111214] px-6 py-5 fixed bottom-0 w-full md:w-fill-available ${showMembers && "2xl:max-w-[75%]"}`}>
                 <form onSubmit={e => {
                         e.preventDefault();
                         const message = e.target.message.value;
@@ -448,7 +452,7 @@ export default function Room() {
                     </form>
                 </div>
             </div>
-            <div className="col-span-3 border-l border-zinc-500/5 h-screen w-full 2xl:block hidden">
+           {showMembers && <div className="col-span-3 border-l border-zinc-500/5 h-screen w-full 2xl:block hidden">
                 <div className="overflow-y-auto h-full p-3 space-y-2">
                     {members?.map(member => (
                         <div> {member?.username != user?.username ?
@@ -472,7 +476,7 @@ export default function Room() {
                       
                     ))}
                 </div>
-            </div>
+            </div>}
         </div>
     
     </>
