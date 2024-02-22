@@ -41,7 +41,7 @@
     <a href="https://github.com/ZeroxyDev/Random-Chat-App"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://seshapp.seshapp.repl.co/">View Demo</a>
+    <a href="https://replit.com/@Seshapp/seshapp">View Demo</a>
     ·
     <a href="https://github.com/ZeroxyDev/Random-Chat-App/issues">Report Bug</a>
     ·
